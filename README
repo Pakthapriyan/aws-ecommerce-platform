@@ -1,125 +1,128 @@
-AWS E-Commerce Platform — AquaMart (Full-Stack)
+# AWS E-Commerce Platform — AquaMart (Full-Stack)
 
-A production-style e-commerce application deployed end-to-end on AWS.
-It includes a secure static frontend, backend API, database, custom domain, SSL, and complete cloud infrastructure following best practices.
+A production-style e-commerce application deployed end-to-end on AWS.  
+It includes a secure static frontend, backend API, database, custom domain, SSL, and complete cloud infrastructure following AWS best practices.
 
-Live Project: https://aquamart.dpdns.org
+**Live Project:** https://aquamart.dpdns.org
 
-1. Project Overview
+---
 
-Frontend: React app hosted on Amazon S3, delivered via CloudFront using Origin Access Control (OAC).
+# 1. Project Overview
 
-Backend: Node.js & Express running on an EC2 instance with IAM roles for secure DynamoDB access.
+- **Frontend:** React app hosted on **Amazon S3**, delivered via **CloudFront** using **Origin Access Control (OAC)**.  
+- **Backend:** Node.js & Express running on an **EC2 instance**, with IAM roles for secure DynamoDB access.  
+- **Database:** DynamoDB tables for users, products, and orders.  
+- **Domain & SSL:** Managed via **Route 53** and **AWS Certificate Manager (ACM)**.  
+- **Security:** Private S3 bucket, IAM least-privilege roles, tight EC2 security groups.
 
-Database: DynamoDB tables for users, products, and orders.
+---
 
-Domain & SSL: Managed through Route 53 and secured with ACM certificates.
-
-Security: IAM least-privilege policies, private S3 buckets, strict EC2 Security Groups.
-
-2. AWS Architecture
+# 2. AWS Architecture
 
 User → CloudFront → S3 (Frontend) + EC2 API → DynamoDB
 
+```
 CloudFront (CDN + HTTPS)
           ↓
 S3 Bucket (Frontend Hosting)
           ↓
-User ←───────→ EC2 (Node.js API) ←→ DynamoDB
+User ←──────→ EC2 (Node.js API) ←→ DynamoDB
+```
 
-3. Frontend (S3 + CloudFront + HTTPS + OAC)
-Steps
+*(Architecture diagram is included in screenshots)*
 
-Build React app:
+---
 
-cd frontend
-npm install
-npm run build
+# 3. Frontend (S3 + CloudFront + OAC + HTTPS)
 
+## ✅ Deployment Steps
+1. Build the React app:
+   ```bash
+   cd frontend
+   npm install
+   npm run build
+   ```
+2. Create a private S3 bucket (block all public access).  
+3. Upload the React build folder to S3.  
+4. Create a CloudFront distribution:
+   - Origin: S3 bucket  
+   - Enable **Origin Access Control (OAC)**  
+   - Default root: `index.html`  
+5. Request an HTTPS certificate via ACM (us-east-1).  
+6. Attach certificate to CloudFront.  
+7. Invalidate CloudFront cache on updates.
 
-Create S3 bucket (public access blocked).
+## ✅ Related Screenshots
+- S3 bucket  
+- ACM certificate  
 
-Upload build folder to S3.
+---
 
-Create CloudFront distribution:
+# 4. Domain & DNS (Route 53)
 
-Origin: S3 bucket
+## ✅ Steps
+1. Create Hosted Zone in Route 53.  
+2. Map domain using **A (Alias) record → CloudFront**.  
+3. Add ACM validation CNAME automatically.  
+4. Wait for propagation until certificate = **Issued**.
 
-OAC enabled
+## ✅ Screenshot
+- Route 53 hosted zone  
 
-Default root object: index.html
+---
 
-Attach HTTPS certificate from ACM.
+# 5. Backend API (EC2 + IAM Role + Security Groups)
 
-Invalidate CloudFront cache when deploying updates.
+## ✅ Steps
+1. Launch EC2 Ubuntu instance.  
+2. Attach an **IAM Role** with DynamoDB access policy.  
+3. Configure Security Group:
+   - **22** → SSH  
+   - **80** → HTTP  
+   - **443** → HTTPS  
+   - **5000** → API port  
+4. Install Node.js and PM2:
+   ```bash
+   sudo apt update
+   sudo apt install nodejs npm -y
+   sudo npm install -g pm2
+   ```
+5. Download backend code:
+   ```bash
+   git clone https://github.com/Pakthapriyan/Aquamart-Website
+   cd backend
+   npm install
+   ```
+6. Start server:
+   ```bash
+   pm2 start npm -- start
+   pm2 save
+   ```
 
-Screenshots
+## ✅ Screenshot
+- EC2 Security Group rules  
 
-S3 bucket
+---
 
-ACM certificate
+# 6. Database (DynamoDB)
 
-4. Domain & DNS (Route 53)
-Steps
+You created 3 tables:
 
-Create Hosted Zone for your domain.
+| Table     | Partition Key |
+|-----------|----------------|
+| Users     | userId         |
+| Products  | productId      |
+| Orders    | orderId        |
 
-Add A/AAAA alias record pointing to CloudFront.
+- Fully managed  
+- Auto-scaling  
+- No servers needed  
 
-Add ACM validation CNAME.
+---
 
-Wait for DNS propagation.
+# 7. Project Structure
 
-Screenshot
-
-Route 53 hosted zone
-
-5. Backend API (EC2 + IAM Role + Security Groups)
-Steps
-
-Launch EC2 Ubuntu instance.
-
-Attach an IAM role with DynamoDB permissions.
-
-Configure Security Group:
-
-22 → SSH
-
-80 → HTTP
-
-443 → HTTPS
-
-5000 → Backend API
-
-Install Node.js & PM2:
-
-sudo apt update
-sudo apt install nodejs npm -y
-
-
-Clone and start backend:
-
-git clone https://github.com/Pakthapriyan/Aquamart-Website
-cd backend
-npm install
-pm2 start npm -- start
-
-
-(Optional) Configure Nginx reverse proxy.
-
-Screenshot
-
-EC2 Security Group rules
-
-6. Database (DynamoDB)
-
-Tables created:
-
-Table	Partition Key
-Users	userId
-Products	productId
-Orders	orderId
-7. Project Structure
+```
 project/
    frontend/
       src/
@@ -132,28 +135,46 @@ project/
       package.json
 
    README.md
+```
 
-8. Running Locally
-Frontend
+---
+
+# 8. Running Locally
+
+## ✅ Frontend
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
-Backend
+## ✅ Backend
+```bash
 cd backend
 npm install
 npm start
+```
 
-9. Future Improvements
+---
 
-Deploy backend on ECS Fargate
+# 9. Future Improvements
 
-Move API to Lambda + API Gateway
+- Migrate backend to **ECS Fargate** (serverless containers)  
+- Or move to **Lambda + API Gateway (Fully serverless)**  
+- Add **Cognito authentication**  
+- Add **CloudWatch dashboards + alarms**  
+- Add CI/CD via **CodePipeline + CodeBuild**  
+- Add AWS WAF for edge security  
 
-Add Cognito authentication
+---
 
-Add CloudWatch dashboards
+# 10. Screenshots List (Add inside /screenshots folder)
 
-Add CI/CD using CodePipeline
+- `homepage.jpeg`  
+- `architecture.jpeg`  
+- `s3bucket.jpeg`  
+- `acm.jpeg`  
+- `route53.jpeg`  
+- `ec2-security-groups.jpeg`
 
-Add WAF / Shield for extra protection
+---

@@ -3,7 +3,6 @@
 A production-style e-commerce application deployed end-to-end on AWS.  
 It includes a secure static frontend, backend API, database, custom domain, SSL, and complete cloud infrastructure following AWS best practices.
 
-**Live Project:** https://aquamart.dpdns.org
 
 ---
 

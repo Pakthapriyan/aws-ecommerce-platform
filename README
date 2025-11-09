@@ -1,0 +1,159 @@
+AWS E-Commerce Platform — AquaMart (Full-Stack)
+
+A production-style e-commerce application deployed end-to-end on AWS.
+It includes a secure static frontend, backend API, database, custom domain, SSL, and complete cloud infrastructure following best practices.
+
+Live Project: https://aquamart.dpdns.org
+
+1. Project Overview
+
+Frontend: React app hosted on Amazon S3, delivered via CloudFront using Origin Access Control (OAC).
+
+Backend: Node.js & Express running on an EC2 instance with IAM roles for secure DynamoDB access.
+
+Database: DynamoDB tables for users, products, and orders.
+
+Domain & SSL: Managed through Route 53 and secured with ACM certificates.
+
+Security: IAM least-privilege policies, private S3 buckets, strict EC2 Security Groups.
+
+2. AWS Architecture
+
+User → CloudFront → S3 (Frontend) + EC2 API → DynamoDB
+
+CloudFront (CDN + HTTPS)
+          ↓
+S3 Bucket (Frontend Hosting)
+          ↓
+User ←───────→ EC2 (Node.js API) ←→ DynamoDB
+
+3. Frontend (S3 + CloudFront + HTTPS + OAC)
+Steps
+
+Build React app:
+
+cd frontend
+npm install
+npm run build
+
+
+Create S3 bucket (public access blocked).
+
+Upload build folder to S3.
+
+Create CloudFront distribution:
+
+Origin: S3 bucket
+
+OAC enabled
+
+Default root object: index.html
+
+Attach HTTPS certificate from ACM.
+
+Invalidate CloudFront cache when deploying updates.
+
+Screenshots
+
+S3 bucket
+
+ACM certificate
+
+4. Domain & DNS (Route 53)
+Steps
+
+Create Hosted Zone for your domain.
+
+Add A/AAAA alias record pointing to CloudFront.
+
+Add ACM validation CNAME.
+
+Wait for DNS propagation.
+
+Screenshot
+
+Route 53 hosted zone
+
+5. Backend API (EC2 + IAM Role + Security Groups)
+Steps
+
+Launch EC2 Ubuntu instance.
+
+Attach an IAM role with DynamoDB permissions.
+
+Configure Security Group:
+
+22 → SSH
+
+80 → HTTP
+
+443 → HTTPS
+
+5000 → Backend API
+
+Install Node.js & PM2:
+
+sudo apt update
+sudo apt install nodejs npm -y
+
+
+Clone and start backend:
+
+git clone https://github.com/Pakthapriyan/Aquamart-Website
+cd backend
+npm install
+pm2 start npm -- start
+
+
+(Optional) Configure Nginx reverse proxy.
+
+Screenshot
+
+EC2 Security Group rules
+
+6. Database (DynamoDB)
+
+Tables created:
+
+Table	Partition Key
+Users	userId
+Products	productId
+Orders	orderId
+7. Project Structure
+project/
+   frontend/
+      src/
+      public/
+      package.json
+
+   backend/
+      src/
+      routes/
+      package.json
+
+   README.md
+
+8. Running Locally
+Frontend
+cd frontend
+npm install
+npm run dev
+
+Backend
+cd backend
+npm install
+npm start
+
+9. Future Improvements
+
+Deploy backend on ECS Fargate
+
+Move API to Lambda + API Gateway
+
+Add Cognito authentication
+
+Add CloudWatch dashboards
+
+Add CI/CD using CodePipeline
+
+Add WAF / Shield for extra protection

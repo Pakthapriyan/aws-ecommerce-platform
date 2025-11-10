@@ -34,7 +34,7 @@ User ←──────→ EC2 (Node.js API) ←→ DynamoDB
 
 # 3. Frontend (S3 + CloudFront + OAC + HTTPS)
 
-## ✅ Deployment Steps
+##  Deployment Steps
 1. Build the React app:
    ```bash
    cd frontend
@@ -51,28 +51,24 @@ User ←──────→ EC2 (Node.js API) ←→ DynamoDB
 6. Attach certificate to CloudFront.  
 7. Invalidate CloudFront cache on updates.
 
-## ✅ Related Screenshots
-- S3 bucket  
-- ACM certificate  
 
 ---
 
 # 4. Domain & DNS (Route 53)
 
-## ✅ Steps
+##  Steps
 1. Create Hosted Zone in Route 53.  
 2. Map domain using **A (Alias) record → CloudFront**.  
 3. Add ACM validation CNAME automatically.  
 4. Wait for propagation until certificate = **Issued**.
 
-## ✅ Screenshot
-- Route 53 hosted zone  
+ 
 
 ---
 
 # 5. Backend API (EC2 + IAM Role + Security Groups)
 
-## ✅ Steps
+##  Steps
 1. Launch EC2 Ubuntu instance.  
 2. Attach an **IAM Role** with DynamoDB access policy.  
 3. Configure Security Group:
@@ -98,8 +94,6 @@ User ←──────→ EC2 (Node.js API) ←→ DynamoDB
    pm2 save
    ```
 
-## ✅ Screenshot
-- EC2 Security Group rules  
 
 ---
 
@@ -140,14 +134,14 @@ project/
 
 # 8. Running Locally
 
-## ✅ Frontend
+##  Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-## ✅ Backend
+##  Backend
 ```bash
 cd backend
 npm install
@@ -164,16 +158,5 @@ npm start
 - Add **CloudWatch dashboards + alarms**  
 - Add CI/CD via **CodePipeline + CodeBuild**  
 - Add AWS WAF for edge security  
-
----
-
-# 10. Screenshots List (Add inside /screenshots folder)
-
-- `homepage.jpeg`  
-- `architecture.jpeg`  
-- `s3bucket.jpeg`  
-- `acm.jpeg`  
-- `route53.jpeg`  
-- `ec2-security-groups.jpeg`
 
 ---
